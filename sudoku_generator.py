@@ -1,4 +1,4 @@
-import math,random
+import math,random,pygame
 
 """
 This was adapted from a GeeksforGeeks article "Program for Sudoku Generator" by Aarti_Rathi and Ankur Trisal
@@ -209,3 +209,55 @@ def generate_sudoku(size, removed):
     sudoku.remove_cells()
     board = sudoku.get_board()
     return board
+class Cell:
+    def __init__(self, value, row, col, screen):
+        #Initializes a single cell on the Sudoku board
+        self.value = value          #the value of the cell
+        self.sketched_value = None  #the sketched value
+        self.row = row              #row index
+        self.col = col              #column index
+        self.screen = screen        #the screen object
+        self.selected = False       #Boolean to track if cell is selected
+        self.x = col * 60           #X coordinate for cell position
+        self.y = row * 60           #Y coordinate for cell position
+
+    def set_cell_value(self, value):
+        #Sets the value of the cell (used to set a permanent number, not a sketched one).
+        #Parameters:
+        #- value: the new value to set for the cell.
+        self.value = value
+
+    def set_sketched_value(self, value):
+        #Sets a sketched value (a temporary value, e.g., when user is entering digits).
+
+        #Parameters:
+        #- value: the sketched value to set for the cell.
+
+        self.sketched_value = value
+
+    def draw(self):
+        #Draws the cell on the screen, including the value (if set) and highlighting (if selected).
+        #Define color for the cell outline and background
+        cell_color = (255, 255, 255) 
+        selected_color = (255, 0, 0) 
+        line_color = (0, 0, 0)       
+
+        #Draw the cell rectangle (assuming each cell is 60x60 pixels)
+        pygame.draw.rect(self.screen, cell_color, (self.x, self.y, 60, 60))
+
+        #Draw the border
+        pygame.draw.rect(self.screen, line_color, (self.x, self.y, 60, 60), 2)
+
+        #If the cell is selected, highlight it with a red border
+        if self.selected:
+            pygame.draw.rect(self.screen, selected_color, (self.x, self.y, 60, 60), 3)
+
+        #Determine which value to display (actual value or sketched value)
+        display_value = self.sketched_value if self.sketched_value is not None else self.value
+
+        #If the cell has a value, display it (non-zero values)
+        if display_value != 0:
+            font = pygame.font.Font(None, 36)
+            value_text = font.render(str(display_value), True, (0, 0, 0))  # black color for the text
+            text_rect = value_text.get_rect(center=(self.x + 30, self.y + 30))  # Centered text
+            self.screen.blit(value_text, text_rect)
